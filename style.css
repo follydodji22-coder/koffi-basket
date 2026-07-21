@@ -232,3 +232,11 @@ footer {
   .stats { grid-template-columns: 1fr; }
   .nav-links a { margin-left: 1rem; font-size: 0.9rem; }
 }
+.blog-section { padding: 4rem 5%; max-width: 900px; margin: auto; }
+.blog-section h2 { font-family: 'Orbitron', sans-serif; color: var(--rouge); text-align: center; margin-bottom: 2rem; }
+.article-card { background: var(--gris); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; border-left: 4px solid var(--rouge); }
+.badge-cat { background: var(--rouge); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+.article-card h3 { margin: 1rem 0; font-family: 'Orbitron', sans-serif; }
+.article-card p { line-height: 1.8; color: #ccc; }
+.article-card .date { font-size: 0.8rem; color: #888; margin-top: 1rem; }
+.admin-section textarea, .admin-section select { width: 100%; padding: 1rem; background: var(--gris); border: 2px solid #333; border-radius: 10px; color: var(--blanc); margin: 1rem 0; }
