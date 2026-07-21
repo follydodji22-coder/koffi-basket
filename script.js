@@ -6,15 +6,6 @@ const firebaseConfig = {
   messagingSenderId: "1001801483627",
   appId: "1:1001801483627:web:7967fff930e50022b5382e"
 };// 1. COLLE TA VRAIE CONFIG ICI
-const firebaseConfig = {
-  apiKey: "TA_CLE_ICI",
-  authDomain: "TON_PROJET.firebaseapp.com",
-  projectId: "TON_PROJET",
-  storageBucket: "TON_PROJET.appspot.com",
-  messagingSenderId: "123456",
-  appId: "1:123456:web:abcdef"
-};
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
