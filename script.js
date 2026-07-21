@@ -113,11 +113,15 @@ document.getElementById('formJoueur').onsubmit = async (e) => {
   e.preventDefault(); const f = e.target;
   const prix = f.code_promo.value.toUpperCase()==='KOFFI25'?75:100;
   await db.collection("joueurs").add({ 
-    nom:f.nom.value, email:f.email.value, whatsapp:f.whatsapp.value, 
-    mot_de_passe: f.email.value, // par défaut on met l'email comme mdp pour simplifier
-    prix_paye:prix, statut:"attente", date:new Date() 
-  });
-  alert(`Inscription ok! Envoie ${prix}f au 0162196973. Ton mot de passe = ton email pour l'instant`);
+  nom:f.nom.value, 
+  email:f.email.value, 
+  whatsapp:f.whatsapp.value, 
+  mot_de_passe: f.mot_de_passe.value, // <-- On prend ce que le joueur a tapé
+  prix_paye:prix, 
+  statut:"attente", 
+  date:new Date() 
+});
+alert(`Inscription ok! Envoie ${prix}f au 0162196973. Ton mot de passe c'est celui que tu as choisi.`);
   f.reset(); showPage('accueil');
 }
 
