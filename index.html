@@ -2,66 +2,82 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Koffi Basket 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOFFI BASKET 2026</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ACCUEIL -->
-  <section id="accueil" class="page active">
-    <h1>KOFFI BASKET 2026</h1>
-    <button onclick="showPage('inscription')">S'INSCRIRE</button>
-    <button onclick="showPage('actualites')">📢 ACTUALITÉS</button>
-    <button onclick="showPage('admin-login')">ADMIN</button>
-  </section>
+<header>
+  <div class="logo">KOFFI <span>BASKET</span> 🏀</div>
+  <nav>
+    <a onclick="showPage('accueil')">Accueil</a>
+    <a onclick="showPage('actualites')">Actus</a>
+    <a onclick="showPage('inscription')">S'inscrire</a>
+    <a onclick="showPage('admin-login')">Admin</a>
+  </nav>
+</header>
 
-  <!-- INSCRIPTION -->
-  <section id="inscription" class="page">
-    <h2>INSCRIPTION</h2>
-    <form id="formJoueur">
-      <input name="nom" placeholder="Nom complet" required>
-      <input name="nationalite" placeholder="Nationalité" required>
-      <input name="taille" placeholder="Taille cm" required>
-      <input name="poids" placeholder="Poids kg" required>
-      <input name="poste" placeholder="Poste" required>
-      <input name="email" placeholder="Email" required>
-      <input name="whatsapp" placeholder="WhatsApp" required>
-      <input name="code_promo" id="codePromo" placeholder="Code promo KOFFI25">
-      <p>Prix: <span id="prix">100f</span></p>
-      <button type="submit">VALIDER</button>
-    </form>
-    <button onclick="showPage('accueil')">RETOUR</button>
-  </section>
+<section id="accueil" class="page active">
+  <div class="hero">
+    <h1>REJOINS LA <br> LIGUE 5V5</h1>
+    <p>Montre ton talent. Intègre ton équipe. Domine le terrain.</p>
+    <button class="btn-principal" onclick="showPage('inscription')">S'INSCRIRE - 100F</button>
+    <p class="promo">Code promo : <span>KOFFI25</span> = -25%</p>
+  </div>
+</section>
 
-  <!-- ACTUALITÉS -->
-  <section id="actualites" class="page">
-    <h2>📢 ACTUALITÉS</h2>
-    <div id="listeAnnonces">Chargement...</div>
-    <button onclick="showPage('accueil')">RETOUR</button>
-  </section>
+<section id="inscription" class="page section">
+  <h2>INSCRIPTION</h2>
+  <form id="formJoueur">
+    <input name="nom" placeholder="Nom complet" required>
+    <input name="nationalite" placeholder="Nationalité" required>
+    <input name="taille" placeholder="Taille cm" required>
+    <input name="poids" placeholder="Poids kg" required>
+    <input name="poste" placeholder="Poste" required>
+    <input name="email" placeholder="Email" required>
+    <input name="whatsapp" placeholder="WhatsApp" required>
+    <input name="code_promo" id="codePromo" placeholder="Code promo KOFFI25">
+    <p>Prix: <span id="prix">100f</span></p>
+    <button type="submit" class="btn-principal">VALIDER</button>
+  </form>
+  <button onclick="showPage('accueil')">RETOUR</button>
+</section>
 
-  <!-- LOGIN ADMIN -->
-  <section id="admin-login" class="page">
-    <h2>CONNEXION ADMIN</h2>
-    <input type="password" id="adminPass" placeholder="Mot de passe">
-    <button type="button" onclick="loginAdmin()">SE CONNECTER</button>
-    <button onclick="showPage('accueil')">RETOUR</button>
-  </section>
+<section id="actualites" class="page section">
+  <h2>📢 ACTUALITÉS</h2>
+  <div id="listeAnnonces">Chargement...</div>
+  <button onclick="showPage('accueil')">RETOUR</button>
+</section>
 
-  <!-- ADMIN -->
-  <section id="admin" class="page">
-    <div class="admin-header">
-      <h2>PANEL ADMIN</h2>
-      <button type="button" onclick="logout()" class="btn-danger">DÉCONNEXION</button>
-    </div>
-    <div id="statsReelles"></div>
-    <button type="button" onclick="publierAnnonce()">📢 PUBLIER UNE ANNONCE</button>
-    <h3>LISTE JOUEURS EN ATTENTE</h3>
-    <table><tbody id="listeJoueurs"></tbody></table>
-  </section>
+<section id="admin-login" class="page section">
+  <h2>CONNEXION ADMIN</h2>
+  <input type="password" id="adminPass" placeholder="Mot de passe">
+  <button type="button" onclick="loginAdmin()" class="btn-principal">SE CONNECTER</button>
+  <button onclick="showPage('accueil')">RETOUR</button>
+</section>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="script.js"></script>
+<section id="admin" class="page section">
+  <div class="admin-header">
+    <h2>PANEL ADMIN</h2>
+    <button type="button" onclick="logout()" class="btn-danger">DÉCONNEXION</button>
+  </div>
+  <div id="statsReelles"></div>
+  <button type="button" onclick="publierAnnonce()" class="btn-principal">📢 PUBLIER UNE ANNONCE</button>
+  <h3>LISTE JOUEURS EN ATTENTE</h3>
+  <table><tbody id="listeJoueurs"></tbody></table>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 KOFFI BASKET - Email koffibasket2026@gmail.com</p>
+  <p>Écrit et programmée par Dodji Designe</p>
+  <p>+2290129749346/0142757762</p>
+  <p>Email : follydodji22@gmail.com</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="script.js"></script>
 </body>
-  </html>
+    </html>
