@@ -65,9 +65,29 @@
 <div id="listeEquipes"></div>
   </div>
   <div id="statsReelles"></div>
-  <button type="button" onclick="publierAnnonce()" class="btn-principal">📢 PUBLIER UNE ANNONCE</button>
+  <button type="button" onclick="showPage('publier')" class="btn-principal">📢 PUBLIER QUELQUE CHOSE</button>
   <h3>LISTE JOUEURS EN ATTENTE</h3>
   <table><tbody id="listeJoueurs"></tbody></table>
+</section>
+  <!-- PUBLIER -->
+<section id="publier" class="page section">
+  <h2>📢 PUBLIER UNE PUBLICATION</h2>
+  <form id="formPublication">
+    <label>Catégorie :</label>
+    <select id="categoriePub" required>
+      <option value="">-- Choisir --</option>
+      <option value="Technique">🏀 Technique de base</option>
+      <option value="Match">🔥 Match</option>
+      <option value="Astuce">💡 Astuce</option>
+      <option value="Kit">🎒 Kit de Basketball</option>
+    </select>
+    
+    <input id="titrePub" placeholder="Titre de la publication" required>
+    <textarea id="messagePub" placeholder="Écris ton message ici..." rows="5" required style="width:100%; padding:14px; background:#333; color:white; border:none; border-radius:8px;"></textarea>
+    
+    <button type="submit" class="btn-principal">PUBLIER</button>
+  </form>
+  <button onclick="showPage('admin')">RETOUR</button>
 </section>
   <!-- CONNEXION JOUEUR -->
 <section id="login-joueur" class="page section">
