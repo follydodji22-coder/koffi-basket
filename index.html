@@ -65,15 +65,10 @@
   </section>
 
   <!-- PAGE LOGIN ADMIN -->
-  <section id="loginAdmin" class="page form-section">
-    <h2>CONNEXION ADMIN</h2>
-    <form id="formLogin">
-      <input type="password" id="adminPass" placeholder="Mot de passe admin" required>
-      <button type="submit" class="btn-principal">SE CONNECTER</button>
-      <p id="errorLogin" style="color:red; display:none;">Mot de passe incorrect</p>
-    </form>
-  </section>
-
+<section id="admin-login" class="page active">
+  <input type="password" id="adminPass" placeholder="Mot de passe">
+  <button type="button" onclick="loginAdmin()">SE CONNECTER</button> <!-- AJOUTE type="button" -->
+</section>
   <!-- PAGE ADMIN PROPRE -->
   <section id="admin" class="page admin-container">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
