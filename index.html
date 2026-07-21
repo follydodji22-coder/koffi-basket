@@ -78,7 +78,7 @@
   <section id="admin" class="page admin-container">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
     <h2>TABLEAU DE BORD ADMIN</h2>
-    <button onclick="logout()" class="btn-mini danger">Déconnexion</button>
+    <button class="btn-danger" onclick="logout()">DÉCONNEXION</button>
   </div>
 
   <button onclick="document.getElementById('formArticle').scrollIntoView()" class="btn-principal btn-admin-cta">
@@ -103,6 +103,9 @@
 
   <!-- LISTE JOUEURS -->
   <section class="admin-section">
+    <div style="margin: 1rem 0;">
+  <button class="btn-principal" onclick="publierAnnonce()">📢 FAIRE UNE PUBLICATION</button>
+    </div>
     <h3>📋 Liste des joueurs inscrits</h3>
     <table class="admin-table">
       <thead><tr><th>Photo</th><th>Nom</th><th>Poste</th><th>Taille</th><th>WhatsApp</th><th>Statut</th><th>Actions</th></tr></thead>
