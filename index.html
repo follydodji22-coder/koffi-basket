@@ -7,14 +7,15 @@
 </head>
 <body>
 
-  <!-- PAGE ACCUEIL -->
+  <!-- ACCUEIL -->
   <section id="accueil" class="page active">
     <h1>KOFFI BASKET 2026</h1>
     <button onclick="showPage('inscription')">S'INSCRIRE</button>
+    <button onclick="showPage('actualites')">📢 ACTUALITÉS</button>
     <button onclick="showPage('admin-login')">ADMIN</button>
   </section>
 
-  <!-- PAGE INSCRIPTION -->
+  <!-- INSCRIPTION -->
   <section id="inscription" class="page">
     <h2>INSCRIPTION</h2>
     <form id="formJoueur">
@@ -32,7 +33,14 @@
     <button onclick="showPage('accueil')">RETOUR</button>
   </section>
 
-  <!-- PAGE LOGIN ADMIN -->
+  <!-- ACTUALITÉS -->
+  <section id="actualites" class="page">
+    <h2>📢 ACTUALITÉS</h2>
+    <div id="listeAnnonces">Chargement...</div>
+    <button onclick="showPage('accueil')">RETOUR</button>
+  </section>
+
+  <!-- LOGIN ADMIN -->
   <section id="admin-login" class="page">
     <h2>CONNEXION ADMIN</h2>
     <input type="password" id="adminPass" placeholder="Mot de passe">
@@ -40,15 +48,15 @@
     <button onclick="showPage('accueil')">RETOUR</button>
   </section>
 
-  <!-- PAGE ADMIN -->
+  <!-- ADMIN -->
   <section id="admin" class="page">
     <div class="admin-header">
       <h2>PANEL ADMIN</h2>
-      <button type="button" onclick="logout()">DÉCONNEXION</button>
+      <button type="button" onclick="logout()" class="btn-danger">DÉCONNEXION</button>
     </div>
     <div id="statsReelles"></div>
-    <button type="button" onclick="publierAnnonce()">📢 PUBLICATION</button>
-    <h3>LISTE JOUEURS</h3>
+    <button type="button" onclick="publierAnnonce()">📢 PUBLIER UNE ANNONCE</button>
+    <h3>LISTE JOUEURS EN ATTENTE</h3>
     <table><tbody id="listeJoueurs"></tbody></table>
   </section>
 
@@ -56,4 +64,4 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="script.js"></script>
 </body>
-</html>
+  </html>
