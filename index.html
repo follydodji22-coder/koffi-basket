@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOFFI BASKET 🏀</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+  <header>
+    <nav>
+      <h1 class="logo">KOFFI <span>BASKET</span> 🏀</h1>
+      <div class="nav-links">
+        <a href="#" onclick="showPage('accueil')">Accueil</a>
+        <a href="#" onclick="showPage('inscription')">S'inscrire</a>
+        <a href="#" onclick="showPage('loginAdmin')">Admin</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- PAGE ACCUEIL -->
+  <section id="accueil" class="page active hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h2>REJOINS LA LIGUE 5V5</h2>
+      <p>Montre ton talent. Intègre ton équipe. Domine le terrain.</p>
+      <a href="#" onclick="showPage('inscription')" class="btn-principal">S'INSCRIRE - 100f</a>
+      <p class="promo">Code promo : <span>KOFFI25</span> = -25%</p>
+    </div>
+  </section>
+
+  <!-- PAGE INSCRIPTION -->
+  <section id="inscription" class="page form-section">
+    <h2>FORMULAIRE D'INSCRIPTION</h2>
+    <form id="formJoueur">
+      <div class="form-grid">
+        <input type="text" name="nom" placeholder="Nom complet" required>
+        <input type="text" name="nationalite" placeholder="Nationalité" required>
+        <input type="number" name="taille" placeholder="Taille en cm" required>
+        <input type="number" name="poids" placeholder="Poids en kg" required>
+        <select name="poste" required>
+          <option value="">Poste préféré</option>
+          <option>Meneur</option><option>Arrière</option><option>Ailier</option>
+          <option>Ailier Fort</option><option>Pivot</option>
+        </select>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="tel" name="whatsapp" placeholder="Numéro WhatsApp" required>
+      </div>
+      <label class="upload">📸 Ajouter ta photo
+        <input type="file" name="photo" accept="image/*" required>
+      </label>
+      <input type="text" name="code_promo" placeholder="Code promo KOFFI25" id="codePromo">
+      <div class="paiement">
+        <p>Frais d'inscription : <span id="prix">100f</span></p>
+        <p>Envoyer à : <strong>0162196973</strong></p>
+      </div>
+      <button type="submit" class="btn-principal">VALIDER MON INSCRIPTION</button>
+    </form>
+  </section>
+
+  <!-- PAGE LOGIN ADMIN -->
+  <section id="loginAdmin" class="page form-section">
+    <h2>CONNEXION ADMIN</h2>
+    <form id="formLogin">
+      <input type="password" id="adminPass" placeholder="Mot de passe admin" required>
+      <button type="submit" class="btn-principal">SE CONNECTER</button>
+      <p id="errorLogin" style="color:red; display:none;">Mot de passe incorrect</p>
+    </form>
+  </section>
+
+  <!-- PAGE ADMIN PROPRE -->
+  <section id="admin" class="page admin-container">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>TABLEAU DE BORD ADMIN</h2>
+      <button onclick="logout()" class="btn-mini danger">Déconnexion</button>
+    </div>
+
+    <div class="stats" id="statsReelles">
+      <!-- Les vrais chiffres vont se charger ici -->
+    </div>
+
+    <section class="admin-section">
+      <h3>📋 Liste des joueurs inscrits</h3>
+      <table class="admin-table">
+        <thead>
+          <tr><th>Photo</th><th>Nom</th><th>Poste</th><th>Taille</th><th>WhatsApp</th><th>Statut</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="listeJoueurs">
+          <!-- Les vrais joueurs vont s'afficher ici -->
+        </tbody>
+      </table>
+    </section>
+  </section>
+
+  <footer><p>© 2026 KOFFI BASKET - Abomey-Calavi</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>
