@@ -1,52 +1,20 @@
-:root{
-  --rouge: #FF0033;      /* Le rouge du bouton */
-  --noir: #0A0A0A;       /* Fond noir */
-  --gris: #1A1A1A;       /* Fond des cartes */
-  --blanc: #FFFFFF;
-  --vert: #00FF88;       /* Vert pour KOFFI25 */
-}
-
-*{margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif;}
-
-body{
-  background: var(--noir);
-  color: var(--blanc);
-}
-
-/* HEADER */
-header{
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 1rem; border-bottom: 2px solid var(--rouge);
-}
+:root{ --rouge: #FF0033; --noir: #0A0A0A; --gris: #1A1A1A; --blanc: #FFFFFF; --vert: #00FF88; }
+body{ background: var(--noir); color: var(--blanc); margin:0; font-family: 'Arial', sans-serif;}
+header{ display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 2px solid var(--rouge); background: var(--gris);}
 .logo{ font-size: 1.5rem; font-weight: bold; }
 .logo span{ color: var(--rouge); }
-nav a{ color: var(--blanc); text-decoration: none; margin: 0 10px; font-weight: bold;}
+nav a{ color: var(--blanc); text-decoration: none; margin: 0 10px; cursor: pointer; font-weight: bold;}
 nav a:hover{ color: var(--rouge); }
-
-/* HERO AVEC FILET */
-.hero{
-  background: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=800') no-repeat center;
-  background-size: cover;
-  padding: 4rem 1rem;
-  text-align: left;
-}
-.hero h1{ font-size: 2.5rem; line-height: 1.2; margin-bottom: 1rem;}
-.hero p{ margin-bottom: 1.5rem; max-width: 400px;}
-
-.btn-principal{
-  background: var(--rouge); color: var(--blanc); border: none; padding: 15px 30px;
-  border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer;
-}
-.promo{ margin-top: 1rem; }
+.page{ display: none; }
+.page.active{ display: block; }
+.hero{ background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=800') no-repeat center; background-size: cover; padding: 4rem 1rem; text-align: left;}
+.hero h1{ font-size: 2.5rem; }
+.btn-principal{ background: var(--rouge); color: var(--blanc); border: none; padding: 15px 30px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; margin: 10px 0;}
 .promo span{ color: var(--vert); font-weight: bold; }
-
-/* SECTIONS */
 .section{ background: var(--gris); margin: 1rem; padding: 1.5rem; border-radius: 10px;}
-.section h2{ margin-bottom: 1rem; border-bottom: 2px solid var(--rouge); padding-bottom: 10px;}
-
-table{ width: 100%; color: var(--blanc); }
-th, td{ padding: 10px; text-align: left; }
-th{ border-bottom: 2px solid var(--rouge); }
-
-/* FOOTER */
-footer{ text-align: center; padding: 2rem 1rem; border-top: 2px solid var(--rouge); margin-top: 2rem; font-size: 14px;}
+input{ width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; border: none; background: #333; color: white;}
+.btn-danger{ background: #dc3545; }
+table{ width: 100%; }
+th{ border-bottom: 2px solid var(--rouge); padding: 10px; }
+.approve-btn{ background: #28A745; } .reject-btn{ background: #dc3545; }
+footer{ text-align: center; padding: 2rem 1rem; border-top: 2px solid var(--rouge); margin-top: 2rem; background: var(--gris); font-size: 14px;}
