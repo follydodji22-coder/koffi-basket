@@ -129,3 +129,14 @@ window.supprimerJoueur = async function(id){
     chargerJoueurs();
   }
                           }
+window.publierAnnonce = async function(){
+  const message = prompt("Écris ton annonce pour tous les joueurs :"); // ça ouvre une petite fenêtre
+  if(!message) return; // si tu annules, ça fait rien
+  
+  await db.collection("annonces").add({ // ça enregistre dans Firebase
+    message: message,
+    date: new Date()
+  });
+  
+  alert("Annonce publiée ✅");
+}
