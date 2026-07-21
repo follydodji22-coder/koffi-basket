@@ -128,8 +128,13 @@ alert(`Inscription ok! Envoie ${prix}f au 0162196973. Ton mot de passe c'est cel
 // 2. CONNEXION JOUEUR
 window.loginJoueur = async () => {
   const email = document.getElementById('loginEmail').value;
-  const pass = document.getElementById('loginPass').value;
-  const snap = await db.collection("joueurs").where("email","==",email).where("mot_de_passe","==",pass).get(); // on enlève le "approuve"
+  const pass = document.getElementById('loginPass').value; // <-- On prend le vrai mdp tapé
+
+  // On cherche le joueur avec Email ET Mot de passe
+  const snap = await db.collection("joueurs")
+   .where("email","==",email)
+   .where("mot_de_passe","==",pass) // <-- ICI on vérifie le vrai mdp
+   .get();
 
   if(snap.size > 0){
     joueurConnecte = snap.docs[0].data();
@@ -149,8 +154,10 @@ window.loginJoueur = async () => {
       showPage('accueil');
     }
 
-  } else { alert("Mauvais email ou mot de passe"); }
+  } else {
+    alert("Mauvais email ou mot de passe");
   }
+}
 // 3. CREER EQUIPE
 window.soumettreEquipe = async () => {
   const nom = document.getElementById('nomEquipe').value;
@@ -168,8 +175,17 @@ async function chargerMesEquipes(){
 // 4. MESSAGERIE
 window.envoyerMessage = async () => {
   const msg = document.getElementById('messageInput').value;
-  await db.collection("messages").add({ de: joueurConnecte.email, message: msg, date: new Date() });
-  document.getElementById('messageInput').value = ""; chargerMessages();
+  if(msg.trim() === "") return;
+  
+  await db.collection("messages").add({ 
+    de: joueurConnecte.email, // qui envoie
+    pour: "admin", // <-- AJOUTE ÇA : ça part à l'admin
+    message: msg, 
+    date: new Date() 
+  });
+  document.getElementById('messageInput').value = ""; 
+  chargerMessages();
+  }
 }
 async function chargerMessages(){
   const snap = await db.collection("messages").orderBy("date").get();
