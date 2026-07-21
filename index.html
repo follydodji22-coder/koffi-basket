@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOFFI BASKET Bénin - Par Jeovani</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+<header>
+<nav>
+    <h1 class="logo">🏀 KOFFI <span>BASKET</span></h1>
+    <ul>
+        <li><a href="#accueil">Accueil</a></li>
+        <li><a href="#blog">Matchs</a></li>
+        <li><a href="#joueurs">Joueurs</a></li>
+        <li><a href="#magasin">Magasin</a></li>
+        <li><a href="#inscription">S'inscrire</a></li>
+        <li><button id="btn-connexion">Admin</button></li>
+        <div id="admin-panel" style="display:none;">
+    <h3>Publier un Nouveau Match</h3>
+    <input type="text" id="titre-match" placeholder="Titre: Match 5V5 Cotonou">
+    <input type="date" id="date-match">
+    <input type="text" id="lieu-match" placeholder="Lieu: Terrain de Fidjrosse">
+    <button class="btn" onclick="publierMatch()">Publier le Match</button>
+    <hr>
+    <h4>Joueurs Inscrits</h4>
+    <div id="liste-admin-joueurs"></div>
+</div>
+    </ul>
+</nav>
+</header>
+
+<section id="accueil">
+    <h2>Trouve 10 joueurs. Jouez 5V5.</h2>
+    <p>La plateforme KOFFI BASKET pour basketteurs passionnés au Bénin</p>
+    <p>Frais d'adhésion: <b>100F</b> via Mobile Money <b>0162196973</b></p>
+    <a href="#inscription" class="btn">Rejoindre KOFFI BASKET</a>
+</section>
+
+<section id="blog">
+    <h2>Derniers Matchs KOFFI - Postés par Jeovani</h2>
+    <div class="blog-container" id="liste-posts"></div>
+    <button id="btn-nouveau-post" class="btn" style="display:none;">+ Nouveau Match</button>
+</section>
+
+<section id="magasin">
+    <h2>🛒 Magasin KOFFI BASKET</h2>
+    <div class="produit-card">
+        <h3>Maillot KOFFI</h3>
+        <p>5000F</p>
+        <button onclick="acheter('Maillot KOFFI', 5000)">Acheter</button>
+    </div>
+    <div class="produit-card">
+        <h3>Ballon KOFFI</h3>
+        <p>8000F</p>
+        <button onclick="acheter('Ballon KOFFI', 8000)">Acheter</button>
+    </div>
+</section>
+
+<section id="joueurs">
+    <h2>Annuaire des Joueurs KOFFI</h2>
+    <div class="joueurs-container" id="liste-joueurs"></div>
+    <div id="zone-equipe">
+        <h3>Mon Équipe KOFFI 5V5: <span id="compteur">0/10</span></h3>
+        <div id="ma-team"></div>
+        <button id="btn-lancer-invit" class="btn">Lancer l'invitation</button>
+    </div>
+</section>
+
+<section id="inscription">
+    <h2>Inscription KOFFI BASKET - 100F</h2>
+    <form id="form-inscription">
+        <h3>Infos Identité</h3>
+        <input type="text" id="nom" placeholder="Nom Complet" required>
+        <input type="tel" id="whatsapp" placeholder="Numéro WhatsApp MM" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="promo" placeholder="Code Promo: KOFFI25">
+        <p><b>Prix à payer: <span id="prix">100F</span></b></p>
+        
+        <h3>Infos Sportives</h3>
+        <input type="number" id="taille" placeholder="Taille en cm" required>
+        <select id="poste" required>
+            <option value="">Choisir Poste</option>
+            <option>Meneur</option><option>Arrière</option><option>Ailier</option><option>Ailier Fort</option><option>Pivot</option>
+        </select>
+        <select id="niveau" required>
+            <option value="">Niveau</option>
+            <option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
+        </select>
+        <input type="text" id="ville" placeholder="Ville" required>
+        <button type="submit" class="btn">Payer 100F & Rejoindre KOFFI</button>
+    </form>
+</section>
+
+<div id="popup-admin" class="popup">
+    <div class="popup-content">
+        <h3>Connexion Admin KOFFI BASKET</h3>
+        <input type="password" id="admin-pass" placeholder="Mot de passe admin">
+        <button id="btn-admin-login">Se connecter</button>
+        <button id="btn-fermer">Fermer</button>
+        
+        <!-- CE BLOC DOIT ÊTRE ICI -->
+        <div id="admin-panel" style="display:none; margin-top:20px;">
+            <h3>Publier un Nouveau Match</h3>
+            <input type="text" id="titre-match" placeholder="Titre: Match 5V5 Cotonou">
+            <input type="date" id="date-match">
+            <input type="text" id="lieu-match" placeholder="Lieu: Terrain de Fidjrosse">
+            <button class="btn" onclick="publierMatch()">Publier le Match</button>
+            <hr>
+            <h4>Joueurs Inscrits</h4>
+            <div id="liste-admin-joueurs"></div>
+        </div>
+    </div>
+</div>
+
+<footer><p>© 2026 KOFFI BASKET. Créé par Jeovani</p></footer>
+<script type="module">
+  // 1. IMPORT FIREBASE
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+  // 2. TA CONFIG
+  const firebaseConfig = {
+    apiKey: "AIzaSyA8cBtmnQp0sXTDfnWnLPhhkdR8w6u3ZjI",
+    authDomain: "koffi-basket-bj.firebaseapp.com",
+    projectId: "koffi-basket-bj",
+    storageBucket: "koffi-basket-bj.firebasestorage.app",
+    messagingSenderId: "575669209537",
+    appId: "1:575669209537:web:656bd5164178060ff24740"
+  };
+
+  // 3. INITIALISATION
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const NUM_MM = "0162196973";
+  const ADMIN_PASS = "KOFFI2026";
+
+  // 4. INSCRIPTION -> ENVOIE DANS FIREBASE
+  document.getElementById('form-inscription').addEventListener('submit', async function(e){
+      e.preventDefault();
+      let prix = document.getElementById('prix').innerText;
+      let joueur = {
+          nom: document.getElementById('nom').value,
+          whatsapp: document.getElementById('whatsapp').value,
+          email: document.getElementById('email').value,
+          taille: document.getElementById('taille').value,
+          poste: document.getElementById('poste').value,
+          niveau: document.getElementById('niveau').value,
+          ville: document.getElementById('ville').value,
+          prix: prix,
+          date: new Date()
+      };
+      
+      await addDoc(collection(db, "joueurs"), joueur); // SAUVEGARDE
+      alert(`Inscrit ! 1. Envoie ${prix} au ${NUM_MM}`);
+      this.reset();
+      chargerJoueurs(); // Recharge la liste
+  });
+
+  // 5. PUBLIER UN MATCH - POUR JEOVANI
+  window.publierMatch = async function(){
+      let match = {
+          titre: document.getElementById('titre-match').value,
+          date: document.getElementById('date-match').value,
+          lieu: document.getElementById('lieu-match').value
+      };
+      await addDoc(collection(db, "matchs"), match);
+      alert("Match publié !");
+      document.getElementById('titre-match').value = "";
+  }
+
+  // 6. AFFICHER LES JOUEURS ET MATCHS EN DIRECT
+  function chargerJoueurs(){
+      onSnapshot(collection(db, "joueurs"), (snapshot) => {
+          let liste = "";
+          snapshot.forEach(doc => {
+              let j = doc.data();
+              liste += `<div class="joueur-card"><b>${j.nom}</b><br>${j.poste} - ${j.ville}</div>`;
+          });
+          document.getElementById('liste-joueurs').innerHTML = liste;
+          document.getElementById('compteur').innerText = snapshot.size + '/10';
+          document.getElementById('liste-admin-joueurs').innerHTML = liste;
+      });
+  }
+  
+  function chargerMatchs(){
+      onSnapshot(collection(db, "matchs"), (snapshot) => {
+          let liste = "";
+          snapshot.forEach(doc => {
+              let m = doc.data();
+              liste += `<div class="produit-card"><h3>${m.titre}</h3><p>📅 ${m.date}</p><p>📍 ${m.lieu}</p></div>`;
+          });
+          document.getElementById('liste-posts').innerHTML = liste;
+      });
+  }
+
+  // 7. ADMIN LOGIN
+  window.ouvrirPopup = () => document.getElementById('popup-admin').style.display = 'flex';
+  window.fermerPopup = () => document.getElementById('popup-admin').style.display = 'none';
+  window.adminLogin = () => {
+      if(document.getElementById('admin-pass').value === ADMIN_PASS){
+          alert("Bienvenue Jeovani 👑");
+          document.getElementById('login-box').style
+<script src="script.js"></script>
+</body>
+</html>
