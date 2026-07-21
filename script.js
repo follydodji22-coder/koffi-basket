@@ -144,3 +144,41 @@ window.supprimer = async function(id) {
 
 // 7. DECONNEXION
 window.logout = function() { showPage('accueil'); }
+// CHARGER LES ARTICLES
+async function chargerArticles() {
+  const snapshot = await db.collection("articles").orderBy("date", "desc").get();
+  const container = document.getElementById('listeArticles');
+  if(!container) return;
+  container.innerHTML = "";
+  snapshot.forEach(doc => {
+    const a = doc.data();
+    const date = a.date.toDate().toLocaleDateString('fr-FR');
+    container.innerHTML += `
+      <div class="article-card">
+        <span class="badge-cat">${a.categorie}</span>
+        <h3>${a.titre}</h3>
+        <p>${a.contenu}</p>
+        <div class="date">Publié le ${date}</div>
+      </div>`;
+  });
+}
+
+// PUBLICATION ARTICLE
+document.addEventListener('DOMContentLoaded', function() {
+  const formArticle = document.getElementById('formArticle');
+  if(formArticle){
+    formArticle.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await db.collection("articles").add({
+        titre: document.getElementById('titreArticle').value,
+        categorie: document.getElementById('categorieArticle').value,
+        contenu: document.getElementById('contenuArticle').value,
+        date: new Date()
+      });
+      alert("Article publié !");
+      formArticle.reset();
+      chargerArticles();
+    });
+  }
+  chargerArticles(); // charge au démarrage
+});
