@@ -61,12 +61,58 @@
   <div class="admin-header">
     <h2>PANEL ADMIN</h2>
     <button type="button" onclick="logout()" class="btn-danger">DÉCONNEXION</button>
+    <h3>EQUIPES EN ATTENTE</h3>
+<div id="listeEquipes"></div>
   </div>
   <div id="statsReelles"></div>
   <button type="button" onclick="publierAnnonce()" class="btn-principal">📢 PUBLIER UNE ANNONCE</button>
   <h3>LISTE JOUEURS EN ATTENTE</h3>
   <table><tbody id="listeJoueurs"></tbody></table>
 </section>
+  <!-- CONNEXION JOUEUR -->
+<section id="login-joueur" class="page section">
+  <h2>CONNEXION JOUEUR</h2>
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPass" placeholder="Mot de passe">
+  <button type="button" onclick="loginJoueur()" class="btn-principal">SE CONNECTER</button>
+  <button onclick="showPage('accueil')">RETOUR</button>
+</section>
+
+<!-- ESPACE JOUEUR -->
+<section id="espace-joueur" class="page section">
+  <div class="admin-header">
+    <h2>MON ESPACE</h2>
+    <button type="button" onclick="logoutJoueur()" class="btn-danger">DÉCONNEXION</button>
+  </div>
+  <h3 id="bienvenueJoueur"></h3>
+  <button onclick="showPage('creer-equipe')" class="btn-principal">+ CREER MON EQUIPE 5V5</button>
+  <button onclick="showPage('messagerie')">💬 MESSAGERIE</button>
+  <h3>Mes Equipes</h3>
+  <div id="mesEquipes"></div>
+</section>
+
+<!-- CREER EQUIPE -->
+<section id="creer-equipe" class="page section">
+  <h2>CREER UNE EQUIPE 5V5</h2>
+  <input id="nomEquipe" placeholder="Nom de l'équipe">
+  <p>Ajoute 5 joueurs avec leur email</p>
+  <input class="membre" placeholder="Email Joueur 1">
+  <input class="membre" placeholder="Email Joueur 2">
+  <input class="membre" placeholder="Email Joueur 3">
+  <input class="membre" placeholder="Email Joueur 4">
+  <input class="membre" placeholder="Email Joueur 5">
+  <button onclick="soumettreEquipe()" class="btn-principal">ENVOYER A L'ADMIN</button>
+  <button onclick="showPage('espace-joueur')">RETOUR</button>
+</section>
+
+<!-- MESSAGERIE -->
+<section id="messagerie" class="page section">
+  <h2>💬 MESSAGERIE</h2>
+  <div id="chatBox" style="height:300px; overflow-y:scroll; background:#222; padding:10px; border-radius:8px;"></div>
+  <input id="messageInput" placeholder="Ecris ton message...">
+  <button onclick="envoyerMessage()" class="btn-principal">ENVOYER</button>
+  <button onclick="showPage('espace-joueur')">RETOUR</button>
+    </section>
 
 <!-- FOOTER -->
 <footer>
