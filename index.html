@@ -14,10 +14,11 @@
     <nav>
       <h1 class="logo">KOFFI <span>BASKET</span> 🏀</h1>
       <div class="nav-links">
-        <a href="#" onclick="showPage('accueil')">Accueil</a>
-        <a href="#" onclick="showPage('inscription')">S'inscrire</a>
-        <a href="#" onclick="showPage('loginAdmin')">Admin</a>
-      </div>
+  <a href="#" onclick="showPage('accueil')">Accueil</a>
+  <a href="#" onclick="showPage('blog')">Actus</a>  <!-- AJOUTE CETTE LIGNE -->
+  <a href="#" onclick="showPage('inscription')">S'inscrire</a>
+  <a href="#" onclick="showPage('loginAdmin')">Admin</a>
+</div>
     </nav>
   </header>
 
@@ -31,6 +32,11 @@
       <p class="promo">Code promo : <span>KOFFI25</span> = -25%</p>
     </div>
   </section>
+  <!-- PAGE BLOG / ACTUALITES -->
+<section id="blog" class="page blog-section">
+  <h2>📰 ACTUALITÉS & TECHNIQUES</h2>
+  <div id="listeArticles"></div>
+</section>
 
   <!-- PAGE INSCRIPTION -->
   <section id="inscription" class="page form-section">
@@ -79,6 +85,18 @@
     </div>
 
     <div class="stats" id="statsReelles">
+      <section class="admin-section">
+  <h3>✍️ Publier un article</h3>
+  <form id="formArticle">
+    <input type="text" id="titreArticle" placeholder="Titre: Ex: Match Samedi 17h" required>
+    <select id="categorieArticle" required>
+      <option value="">Catégorie</option>
+      <option>Match</option><option>Technique</option><option>Astuce</option><option>Info</option>
+    </select>
+    <textarea id="contenuArticle" placeholder="Écris ton article ici..." rows="5" required></textarea>
+    <button type="submit" class="btn-principal">PUBLIER</button>
+  </form>
+      </section>
       <!-- Les vrais chiffres vont se charger ici -->
     </div>
 
