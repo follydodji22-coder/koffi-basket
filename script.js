@@ -49,7 +49,21 @@ window.approuverEquipe = async (id) => {
   alert("Equipe approuvée"); 
   chargerEquipes(); 
 }
-window.approuver = async (id) => { await db.collection("joueurs").doc(id).update({statut:"approuve"}); alert("Joueur approuvé"); chargerJoueurs(); }
+window.approuver = async (id) => {
+  await db.collection("joueurs").doc(id).update({statut:"approuve"});
+  alert("Joueur approuvé");
+
+  // ENVOIE UNE NOTIF AU JOUEUR
+  const joueur = await db.collection("joueurs").doc(id).get();
+  await db.collection("notifications").add({
+    pour: joueur.data().email,
+    message: "Félicitations! Ton inscription KOFFI BASKET a été approuvée. Tu peux maintenant te connecter.",
+    lu: false,
+    date: new Date()
+  });
+
+  chargerJoueurs();
+}
 window.refuser = async (id) => { await db.collection("joueurs").doc(id).update({statut:"refuse"}); alert("Joueur refusé"); chargerJoueurs(); }
 
 async function chargerAnnonces(){
@@ -111,15 +125,28 @@ document.getElementById('formJoueur').onsubmit = async (e) => {
 window.loginJoueur = async () => {
   const email = document.getElementById('loginEmail').value;
   const pass = document.getElementById('loginPass').value;
-  const snap = await db.collection("joueurs").where("email","==",email).where("mot_de_passe","==",pass).where("statut","==","approuve").get();
-  if(snap.size > 0){ 
-    joueurConnecte = snap.docs[0].data();
-    document.getElementById('bienvenueJoueur').textContent = "Bienvenue " + joueurConnecte.nom;
-    showPage('espace-joueur'); chargerMesEquipes();
-  } else { alert("Compte non approuvé ou mauvais identifiants"); }
-}
-window.logoutJoueur = () => { joueurConnecte = null; showPage('accueil'); }
+  const snap = await db.collection("joueurs").where("email","==",email).where("mot_de_passe","==",pass).get(); // on enlève le "approuve"
 
+  if(snap.size > 0){
+    joueurConnecte = snap.docs[0].data();
+
+    if(joueurConnecte.statut === "attente"){
+      alert("Ton compte est en attente de validation par l'admin. Reviens plus tard.");
+      showPage('accueil');
+      return;
+    }
+    if(joueurConnecte.statut === "approuve"){
+      document.getElementById('bienvenueJoueur').textContent = "Bienvenue " + joueurConnecte.nom;
+      showPage('espace-joueur');
+      chargerMesEquipes();
+    }
+    if(joueurConnecte.statut === "refuse"){
+      alert("Ton inscription a été refusée.");
+      showPage('accueil');
+    }
+
+  } else { alert("Mauvais email ou mot de passe"); }
+  }
 // 3. CREER EQUIPE
 window.soumettreEquipe = async () => {
   const nom = document.getElementById('nomEquipe').value;
