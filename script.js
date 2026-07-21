@@ -194,3 +194,23 @@ async function chargerMessages(){
   document.getElementById('chatBox').innerHTML = html;
 }
 setInterval(chargerMessages, 3000); // recharge toutes les 3s
+async function chargerMessagesAdmin(){
+  const snap = await db.collection("messages").where("pour","==","admin").orderBy("date").get();
+  let html = "";
+  snap.forEach(d=>{ html += `<p><b>${d.data().de}:</b> ${d.data().message}</p>`; });
+  document.getElementById('chatAdmin').innerHTML = html;
+}
+
+window.repondreJoueur = async () => {
+  const msg = document.getElementById('reponseAdmin').value;
+  const email = document.getElementById('emailDestinataire').value;
+  await db.collection("messages").add({ 
+    de: "admin",
+    pour: email, // <-- Réponse va à ce joueur
+    message: msg, 
+    date: new Date() 
+  });
+  document.getElementById('reponseAdmin').value = "";
+}
+
+setInterval(chargerMessagesAdmin, 3000); // recharge pour l'admin
