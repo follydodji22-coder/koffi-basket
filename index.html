@@ -79,24 +79,40 @@
 
   <!-- PAGE ADMIN PROPRE -->
   <section id="admin" class="page admin-container">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>TABLEAU DE BORD ADMIN</h2>
-      <button onclick="logout()" class="btn-mini danger">Déconnexion</button>
-    </div>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+    <h2>TABLEAU DE BORD ADMIN</h2>
+    <button onclick="logout()" class="btn-mini danger">Déconnexion</button>
+  </div>
 
-    <div class="stats" id="statsReelles">
-      <section class="admin-section">
-  <h3>✍️ Publier un article</h3>
-  <form id="formArticle">
-    <input type="text" id="titreArticle" placeholder="Titre: Ex: Match Samedi 17h" required>
-    <select id="categorieArticle" required>
-      <option value="">Catégorie</option>
-      <option>Match</option><option>Technique</option><option>Astuce</option><option>Info</option>
-    </select>
-    <textarea id="contenuArticle" placeholder="Écris ton article ici..." rows="5" required></textarea>
-    <button type="submit" class="btn-principal">PUBLIER</button>
-  </form>
-      </section>
+  <button onclick="document.getElementById('formArticle').scrollIntoView()" class="btn-principal btn-admin-cta">
+    + PUBLIER UN NOUVEL ARTICLE
+  </button>
+
+  <div class="stats" id="statsReelles"></div>
+
+  <!-- FORMULAIRE ARTICLE -->
+  <section class="admin-section" id="zonePublication">
+    <h3>✍️ Publier un article</h3>
+    <form id="formArticle">
+      <input type="text" id="titreArticle" placeholder="Titre: Ex: Match Samedi 17h" required>
+      <select id="categorieArticle" required>
+        <option value="">Catégorie</option>
+        <option>Match</option><option>Technique</option><option>Astuce</option><option>Info</option>
+      </select>
+      <textarea id="contenuArticle" placeholder="Écris ton article ici..." rows="5" required></textarea>
+      <button type="submit" class="btn-principal">PUBLIER</button>
+    </form>
+  </section>
+
+  <!-- LISTE JOUEURS -->
+  <section class="admin-section">
+    <h3>📋 Liste des joueurs inscrits</h3>
+    <table class="admin-table">
+      <thead><tr><th>Photo</th><th>Nom</th><th>Poste</th><th>Taille</th><th>WhatsApp</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody id="listeJoueurs"></tbody>
+    </table>
+  </section>
+          </section>
       <!-- Les vrais chiffres vont se charger ici -->
     </div>
 
