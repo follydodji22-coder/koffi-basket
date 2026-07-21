@@ -58,7 +58,40 @@ async function chargerAnnonces(){
   snap.forEach(d=>{ html+=`<div style="background:rgba(0,0,0,0.3); padding:10px; margin:10px 0; border-radius:8px;">${d.data().message}</div>`; });
   document.getElementById('listeAnnonces').innerHTML = html || "Aucune annonce";
 }
-window.publierAnnonce = async () => { const msg = prompt("Ton annonce:"); if(msg){ await db.collection("annonces").add({message:msg, date:new Date()}); alert("Publié"); } }
+// PUBLIER AVEC CATEGORIE
+document.getElementById('formPublication').onsubmit = async (e) => {
+  e.preventDefault();
+  const categorie = document.getElementById('categoriePub').value;
+  const titre = document.getElementById('titrePub').value;
+  const message = document.getElementById('messagePub').value;
+  
+  await db.collection("annonces").add({ 
+    categorie: categorie,
+    titre: titre,
+    message: message,
+    date: new Date() 
+  });
+  
+  alert("Publication envoyée !"); 
+  document.getElementById('formPublication').reset();
+  showPage('admin'); 
+}
+
+// MODIFIE AUSSI chargerAnnonces POUR AFFICHER LA CATEGORIE
+async function chargerAnnonces(){
+  const snap = await db.collection("annonces").orderBy("date","desc").get();
+  let html = "";
+  snap.forEach(d=>{ 
+    const a = d.data();
+    let emoji = a.categorie === "Technique" ? "🏀" : a.categorie === "Match" ? "🔥" : a.categorie === "Astuce" ? "💡" : "🎒";
+    html+=`<div style="background:rgba(0,0,0,0.3); padding:15px; margin:10px 0; border-radius:8px; border-left:4px solid var(--rouge);">
+      <span style="background:var(--rouge); padding:3px 8px; border-radius:5px; font-size:12px;">${emoji} ${a.categorie}</span>
+      <h4 style="margin:10px 0; color:var(--orange);">${a.titre}</h4>
+      <p>${a.message}</p>
+    </div>`; 
+  });
+  document.getElementById('listeAnnonces').innerHTML = html || "Aucune annonce";
+}
 let joueurConnecte = null;
 
 // 1. INSCRIPTION AVEC MOT DE PASSE
