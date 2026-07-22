@@ -119,30 +119,54 @@ window.approuver = async (id) => {
 }
 window.refuser = async (id) => { await db.collection("joueurs").doc(id).update({statut:"refuse"}); alert("Refusé"); chargerJoueurs(); }
 
+let tousLesJoueurs = []; // on garde tous les joueurs en mémoire
+
 async function chargerJoueurs(){
   try{
     const snap = await db.collection("joueurs").get();
-    let html = "";
+    tousLesJoueurs = []; // vide
     snap.forEach(d=>{
       const j = d.data();
       if(j.statut == "attente"){ 
-        const photo = j.photo ? `<img src="${j.photo}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : '<img src="https://i.imgur.com/default.png" style="width:50px; height:50px; border-radius:50%;">';
-        
-        html+=`<tr style="border-bottom:1px solid #444;">
-          <td>${photo}</td>
-          <td>${j.nom}</td>
-          <td>${j.email}</td>
-          <td>${j.prix_paye}f</td>
-          <td>
-            <button onclick="approuver('${d.id}')" style="background:green;">Approuver</button> 
-            <button onclick="refuser('${d.id}')" style="background:red;">Refuser</button>
-          </td>
-        </tr>`; 
+        tousLesJoueurs.push({id: d.id, ...j}); // on stocke
       } 
     });
-    document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=5>Aucun joueur en attente</td></tr>";
+    afficherJoueurs(tousLesJoueurs); // on affiche
   }catch(e){ document.getElementById('listeJoueurs').innerHTML = "<tr><td colspan=5>Erreur</td></tr>"; }
-    }
+}
+
+// NOUVELLE FONCTION POUR AFFICHER
+function afficherJoueurs(liste){
+  let html = "";
+  liste.forEach(j=>{
+    const photo = j.photo ? `<img src="${j.photo}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : '<img src="https://i.imgur.com/default.png" style="width:50px; height:50px; border-radius:50%;">';
+    
+    html+=`<tr style="border-bottom:1px solid #444;">
+      <td>${photo}</td>
+      <td>${j.nom}</td>
+      <td>${j.email}</td>
+      <td>${j.prix_paye}f</td>
+      <td>
+        <button onclick="approuver('${j.id}')" style="background:green;">Approuver</button> 
+        <button onclick="refuser('${j.id}')" style="background:red;">Refuser</button>
+      </td>
+    </tr>`; 
+  });
+  document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=5>Aucun joueur en attente</td></tr>";
+}
+
+// RECHERCHE EN TEMPS RÉEL
+document.addEventListener('input', function(e){
+  if(e.target.id === 'rechercheJoueur'){
+    const texte = e.target.value.toLowerCase();
+    const filtres = tousLesJoueurs.filter(j => 
+      j.nom.toLowerCase().includes(texte) || 
+      j.email.toLowerCase().includes(texte)
+    );
+    afficherJoueurs(filtres);
+  }
+});
+    document.getElementById('
 window.approuverEquipe = async (id) => { await db.collection("equipes").doc(id).update({statut:"approuve"}); alert("Equipe approuvée"); chargerEquipes(); }
 
 window.soumettreEquipe = async () => {
