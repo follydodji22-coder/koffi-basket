@@ -119,14 +119,30 @@ window.approuver = async (id) => {
 }
 window.refuser = async (id) => { await db.collection("joueurs").doc(id).update({statut:"refuse"}); alert("Refusé"); chargerJoueurs(); }
 
-async function chargerEquipes(){
+async function chargerJoueurs(){
   try{
-    const snap = await db.collection("equipes").get();
+    const snap = await db.collection("joueurs").get();
     let html = "";
-    snap.forEach(d=>{ const eq = d.data(); if(eq.statut == "attente"){ html += `<div style="background:#222; padding:10px; margin:10px 0;"> <b>${eq.nom}</b> <br> Capitaine: ${eq.capitaine} <br> Membres: ${eq.membres.join(', ')} <br> <button onclick="approuverEquipe('${d.id}')">Approuver</button> </div>`; } });
-    document.getElementById('listeEquipes').innerHTML = html || "<p>Aucune équipe en attente</p>";
-  }catch(e){ document.getElementById('listeEquipes').innerHTML = "<p>Erreur</p>"; }
-}
+    snap.forEach(d=>{
+      const j = d.data();
+      if(j.statut == "attente"){ 
+        const photo = j.photo ? `<img src="${j.photo}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : '<img src="https://i.imgur.com/default.png" style="width:50px; height:50px; border-radius:50%;">';
+        
+        html+=`<tr style="border-bottom:1px solid #444;">
+          <td>${photo}</td>
+          <td>${j.nom}</td>
+          <td>${j.email}</td>
+          <td>${j.prix_paye}f</td>
+          <td>
+            <button onclick="approuver('${d.id}')" style="background:green;">Approuver</button> 
+            <button onclick="refuser('${d.id}')" style="background:red;">Refuser</button>
+          </td>
+        </tr>`; 
+      } 
+    });
+    document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=5>Aucun joueur en attente</td></tr>";
+  }catch(e){ document.getElementById('listeJoueurs').innerHTML = "<tr><td colspan=5>Erreur</td></tr>"; }
+    }
 window.approuverEquipe = async (id) => { await db.collection("equipes").doc(id).update({statut:"approuve"}); alert("Equipe approuvée"); chargerEquipes(); }
 
 window.soumettreEquipe = async () => {
