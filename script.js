@@ -6,7 +6,6 @@ const firebaseConfig = {
   messagingSenderId: "1001801483627",
   appId: "1:1001801483627:web:7967fff930e50022b5382e"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let joueurConnecte = null;
@@ -14,8 +13,10 @@ let joueurConnecte = null;
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(id==='admin'){ chargerJoueurs().catch(e=>console.log(e)); chargerEquipes().catch(e=>console.log(e)); }
-  if(id==='actualites') chargerAnnonces().catch(e=>console.log(e));
+  if(id==='admin'){
+    setTimeout(()=>{ chargerJoueurs(); chargerEquipes(); }, 50); // <-- DELAI POUR NE PAS FREEZER
+  }
+  if(id==='actualites') setTimeout(()=>{ chargerAnnonces(); }, 50);
 }
 
 // PRIX DYNAMIQUE
@@ -54,7 +55,7 @@ window.loginJoueur = async () => {
     if(joueurConnecte.statut === "attente"){ alert("En attente de validation"); showPage('accueil'); return; }
     if(joueurConnecte.statut === "approuve"){
       document.getElementById('bienvenueJoueur').textContent = "Bienvenue " + joueurConnecte.nom;
-      if(document.getElementById('photoProfil')){ // <-- SECURITE
+      if(document.getElementById('photoProfil')){
         document.getElementById('photoProfil').src = joueurConnecte.photo || 'https://i.imgur.com/default.png';
       }
       showPage('espace-joueur');
@@ -65,10 +66,11 @@ window.loginJoueur = async () => {
   } else { alert("Mauvais email ou mot de passe"); }
 }
 
-// CONNEXION ADMIN
+// CONNEXION ADMIN - VERSION QUI NE PLANTE JAMAIS
 window.loginAdmin = () => {
   const pass = document.getElementById('adminPass').value;
   if(pass === "admin123"){
+    document.getElementById('adminPass').value = ""; // vide le champ
     showPage('admin');
   } else {
     alert("Mauvais mot de passe admin");
@@ -77,17 +79,22 @@ window.loginAdmin = () => {
 window.logout = () => showPage('accueil');
 window.logoutJoueur = () => { joueurConnecte = null; showPage('accueil'); }
 
-// ADMIN : CHARGER JOUEURS
+// ADMIN : CHARGER JOUEURS - SANS WHERE POUR EVITER LE BUG
 async function chargerJoueurs(){
-  const snap = await db.collection("joueurs").where("statut","==","attente").get();
-  let html = "";
-  snap.forEach(d=>{
-    const j = d.data();
-    html+=`<tr><td>${j.nom}</td><td>${j.email}</td><td>${j.prix_paye}f</td>
-    <td><button onclick="approuver('${d.id}')">Approuver</button> <button onclick="refuser('${d.id}')">Refuser</button></td></tr>`;
-  });
-  document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=4>Aucun joueur</td></tr>";
+  try{
+    const snap = await db.collection("joueurs").get(); // ON PREND TOUT
+    let html = "";
+    snap.forEach(d=>{
+      const j = d.data();
+      if(j.statut === "attente"){ // ON FILTRE ICI
+        html+=`<tr><td>${j.nom}</td><td>${j.email}</td><td>${j.prix_paye}f</td>
+        <td><button onclick="approuver('${d.id}')">Approuver</button> <button onclick="refuser('${d.id}')">Refuser</button></td></tr>`;
+      }
+    });
+    document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=4>Aucun joueur en attente</td></tr>";
+  }catch(e){ console.log(e); }
 }
+
 window.approuver = async (id) => {
   const joueur = await db.collection("joueurs").doc(id).get();
   await db.collection("joueurs").doc(id).update({statut:"approuve"});
@@ -96,11 +103,80 @@ window.approuver = async (id) => {
 }
 window.refuser = async (id) => { await db.collection("joueurs").doc(id).update({statut:"refuse"}); alert("Refusé"); chargerJoueurs(); }
 
-// ADMIN : CHARGER EQUIPES
+// ADMIN : CHARGER EQUIPES - SANS WHERE
 async function chargerEquipes(){
-  const snap = await db.collection("equipes").where("statut","==","attente").get();
+  try{
+    const snap = await db.collection("equipes").get(); // ON PREND TOUT
+    let html = "";
+    snap.forEach(d=>{
+      const eq = d.data();
+      if(eq.statut === "attente"){ // ON FILTRE ICI
+        html += `<div style="background:#222; padding:10px; margin:10px 0;">
+          <b>${eq.nom}</b> <br> Capitaine: ${eq.capitaine} <br> Membres: ${eq.membres.join(', ')} <br>
+          <button onclick="approuverEquipe('${d.id}')">Approuver</button>
+        </div>`;
+      }
+    });
+    document.getElementById('listeEquipes').innerHTML = html || "<p>Aucune équipe en attente</p>";
+  }catch(e){ console.log(e); }
+}
+window.approuverEquipe = async (id) => { await db.collection("equipes").doc(id).update({statut:"approuve"}); alert("Equipe approuvée"); chargerEquipes(); }
+
+// JOUEUR : CREER EQUIPE
+window.soumettreEquipe = async () => {
+  const nom = document.getElementById('nomEquipe').value;
+  const membres = [...document.querySelectorAll('.membre')].map(i=>i.value).filter(v=>v);
+  await db.collection("equipes").add({ nom, capitaine: joueurConnecte.email, membres, statut:"attente" });
+  alert("Equipe envoyée à l'admin"); showPage('espace-joueur');
+}
+
+// ADMIN : PUBLIER
+document.getElementById('formPublication').onsubmit = async (e) => {
+  e.preventDefault();
+  const file = document.getElementById('imagePub').files[0];
+  let imageUrl = "";
+  if(file){
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await fetch("https://api.imgbb.com/1/upload?key=TA_CLE_IMGBB_ICI", { method: "POST", body: formData });
+    const data = await res.json();
+    imageUrl = data.data.url;
+  }
+  await db.collection("annonces").add({
+    categorie: document.getElementById('categoriePub').value,
+    titre: document.getElementById('titrePub').value,
+    message: document.getElementById('messagePub').value, image: imageUrl, date: new Date()
+  });
+  alert("Publié"); document.getElementById('formPublication').reset(); showPage('admin');
+}
+
+async function chargerAnnonces(){
+  const snap = await db.collection("annonces").get();
   let html = "";
   snap.forEach(d=>{
-    const eq = d.data();
-    html += `<div style="background:#222; padding:10px; margin:10px 0;">
-      <b>${eq.nom}</b> <br> Capitaine: ${eq.capitaine} <br> Membres: ${eq.membres.join(', ')} <br>
+    const a = d.data();
+    html+=`<div style="background:#222; padding:15px; margin:10px 0; border-radius:10px;">
+      <b>[${a.categorie}] ${a.titre}</b>
+      ${a.image? `<img src="${a.image}" style="width:100%; border-radius:8px; margin:10px 0;">` : ''}
+      <p>${a.message}</p>
+    </div>`;
+  });
+  document.getElementById('listeAnnonces').innerHTML = html || "Aucune annonce";
+}
+
+// NOTIFS
+async function chargerNotifications(){
+  if(!joueurConnecte) return;
+  const snap = await db.collection("notifications").where("pour","==",joueurConnecte.email).where("lu","==",false).get();
+  if(snap.size > 0 && document.getElementById('notifBox')){
+    document.getElementById('notifBox').style.display = 'block';
+    document.getElementById('nbNotif').textContent = snap.size;
+  }
+}
+window.voirNotifications = async () => {
+  const snap = await db.collection("notifications").where("pour","==",joueurConnecte.email).where("lu","==",false).get();
+  let texte = "";
+  snap.forEach(d => { texte += "🔔 " + d.data().message + "\n\n"; d.ref.update({lu:true}); });
+  alert(texte);
+  document.getElementById('notifBox').style.display = 'none';
+}
