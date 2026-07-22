@@ -36,7 +36,7 @@ window.onload = function(){
       if(photoFile){
         const formData = new FormData();
         formData.append("image", photoFile);
-        const res = await fetch("https://api.imgbb.com/1/upload?key=TA_CLE_IMGBB_ICI", { method: "POST", body: formData });
+        const res = await fetch("https://api.imgbb.com/1/upload?key=9a1fb916aa791ee3077810ebda9f7c3b", { method: "POST", body: formData });
         const data = await res.json();
         photoUrl = data.data.url;
       }
@@ -54,7 +54,7 @@ window.onload = function(){
       if(file){
         const formData = new FormData();
         formData.append("image", file);
-        const res = await fetch("https://api.imgbb.com/1/upload?key=TA_CLE_IMGBB_ICI", { method: "POST", body: formData });
+        const res = await fetch("https://api.imgbb.com/1/upload?key=9a1fb916aa791ee3077810ebda9f7c3b", { method: "POST", body: formData });
         const data = await res.json();
         imageUrl = data.data.url;
       }
