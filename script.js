@@ -2,32 +2,28 @@ const firebaseConfig = { apiKey: "AIzaSyDT6IKXPu8g_hUZn74IIXIFFsb9NADNQtw", auth
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let joueurConnecte = null;
-let tousLesJoueurs = []; // on garde tous les joueurs en mémoire
+let tousLesJoueurs = [];
 
 function showPage(id){
-  try{
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    if(id==='admin'){
-      document.getElementById('listeJoueurs').innerHTML = "<tr><td>Chargement...</td></tr>";
-      chargerJoueurs();
-      chargerEquipes();
-    }
-    if(id==='actualites') chargerAnnonces();
-  }catch(e){ console.log("Erreur showPage: ",e) }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='admin'){ chargerJoueurs(); chargerEquipes(); }
+  if(id==='actualites') chargerAnnonces();
 }
 
-window.onload = function(){
+document.addEventListener('DOMContentLoaded', function(){
   // PRIX DYNAMIQUE
-  if(document.getElementById('codePromo')){
-    document.getElementById('codePromo').oninput = (e) => {
+  const codePromo = document.getElementById('codePromo');
+  if(codePromo){
+    codePromo.oninput = (e) => {
       document.getElementById('prix').textContent = e.target.value.toUpperCase()==='KOFFI25'? '75f' : '100f';
     }
   }
 
   // INSCRIPTION
-  if(document.getElementById('formJoueur')){
-    document.getElementById('formJoueur').onsubmit = async (e) => {
+  const formJoueur = document.getElementById('formJoueur');
+  if(formJoueur){
+    formJoueur.onsubmit = async (e) => {
       e.preventDefault(); const f = e.target;
       const prix = f.code_promo.value.toUpperCase()==='KOFFI25'?75:100;
       let photoUrl = "";
@@ -38,7 +34,7 @@ window.onload = function(){
         const res = await fetch("https://api.imgbb.com/1/upload?key=9a1fb916aa791ee3077810ebda9f7c3b", { method: "POST", body: formData });
         const data = await res.json();
         if(data.success){ photoUrl = data.data.url; }
-        else { alert("Erreur upload image: " + data.error.message); return; }
+        else { alert("Erreur upload: " + data.error.message); return; }
       }
       await db.collection("joueurs").add({ nom:f.nom.value, nationalite:f.nationalite.value, taille:f.taille.value, poids:f.poids.value, poste:f.poste.value, email:f.email.value, whatsapp:f.whatsapp.value, mot_de_passe: f.mot_de_passe.value, photo: photoUrl, prix_paye:prix, statut:"attente", date:new Date() });
       alert(`Inscription ok! Envoie ${prix}f au 0162196973.`); f.reset(); showPage('accueil');
@@ -46,8 +42,9 @@ window.onload = function(){
   }
 
   // PUBLICATION
-  if(document.getElementById('formPublication')){
-    document.getElementById('formPublication').onsubmit = async (e) => {
+  const formPublication = document.getElementById('formPublication');
+  if(formPublication){
+    formPublication.onsubmit = async (e) => {
       e.preventDefault();
       const file = document.getElementById('imagePub').files[0];
       let imageUrl = "";
@@ -59,153 +56,103 @@ window.onload = function(){
         imageUrl = data.data.url;
       }
       await db.collection("annonces").add({ categorie: document.getElementById('categoriePub').value, titre: document.getElementById('titrePub').value, message: document.getElementById('messagePub').value, image: imageUrl, date: new Date() });
-      alert("Publié"); document.getElementById('formPublication').reset(); showPage('admin');
+      alert("Publié"); formPublication.reset(); showPage('admin');
     }
   }
 
-  // RECHERCHE EN TEMPS RÉEL
-  if(document.getElementById('rechercheJoueur')){
-    document.getElementById('rechercheJoueur').oninput = function(e){
+  // RECHERCHE
+  const recherche = document.getElementById('rechercheJoueur');
+  if(recherche){
+    recherche.oninput = (e) => {
       const texte = e.target.value.toLowerCase();
-      const filtres = tousLesJoueurs.filter(j =>
-        j.nom.toLowerCase().includes(texte) ||
-        j.email.toLowerCase().includes(texte)
-      );
+      const filtres = tousLesJoueurs.filter(j => j.nom.toLowerCase().includes(texte) || j.email.toLowerCase().includes(texte));
       afficherJoueurs(filtres);
     }
   }
-}
+});
 
-// CONNEXION JOUEUR
+// CONNEXION
 window.loginJoueur = async () => {
   const email = document.getElementById('loginEmail').value;
   const pass = document.getElementById('loginPass').value;
   const snap = await db.collection("joueurs").where("email","==",email).where("mot_de_passe","==",pass).get();
   if(snap.size > 0){
     joueurConnecte = snap.docs[0].data();
-    if(joueurConnecte.statut === "attente"){ alert("En attente de validation"); showPage('accueil'); return; }
+    if(joueurConnecte.statut === "attente"){ alert("En attente"); showPage('accueil'); return; }
     if(joueurConnecte.statut === "approuve"){
       document.getElementById('bienvenueJoueur').textContent = "Bienvenue " + joueurConnecte.nom;
       if(document.getElementById('photoProfil')){ document.getElementById('photoProfil').src = joueurConnecte.photo || 'https://i.imgur.com/default.png'; }
-      showPage('espace-joueur');
-      chargerNotifications();
-      setInterval(chargerNotifications, 5000);
+      showPage('espace-joueur'); chargerNotifications(); setInterval(chargerNotifications, 5000);
     }
-    if(joueurConnecte.statut === "refuse"){ alert("Inscription refusée"); }
+    if(joueurConnecte.statut === "refuse"){ alert("Refusé"); }
   } else { alert("Mauvais email ou mot de passe"); }
 }
 
-// CONNEXION ADMIN
-window.loginAdmin = function(){
-  var pass = document.getElementById('adminPass').value;
-  if(pass == "admin123"){ showPage('admin'); }
-  else { alert("Mauvais mot de passe admin"); }
+window.loginAdmin = () => {
+  if(document.getElementById('adminPass').value == "admin123"){ showPage('admin'); }
+  else { alert("Mauvais mot de passe"); }
 }
 
-window.logout = function(){ showPage('accueil'); }
-window.logoutJoueur = function(){ joueurConnecte = null; showPage('accueil'); }
+window.logout = () => showPage('accueil');
+window.logoutJoueur = () => { joueurConnecte = null; showPage('accueil'); };
 
-// CHARGER + AFFICHER JOUEURS AVEC RECHERCHE
+// JOUEURS ADMIN
 async function chargerJoueurs(){
-  try{
-    const snap = await db.collection("joueurs").get();
-    tousLesJoueurs = [];
-    snap.forEach(d=>{
-      const j = d.data();
-      if(j.statut == "attente"){ tousLesJoueurs.push({id: d.id,...j}); }
-    });
-    afficherJoueurs(tousLesJoueurs);
-  }catch(e){ document.getElementById('listeJoueurs').innerHTML = "<tr><td colspan=5>Erreur</td></tr>"; }
+  const snap = await db.collection("joueurs").get();
+  tousLesJoueurs = [];
+  snap.forEach(d=>{ if(d.data().statut == "attente"){ tousLesJoueurs.push({id: d.id,...d.data()}); } });
+  afficherJoueurs(tousLesJoueurs);
 }
 
 function afficherJoueurs(liste){
   let html = "";
   liste.forEach(j=>{
-    const photo = j.photo? `<img src="${j.photo}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : '<img src="https://i.imgur.com/default.png" style="width:50px; height:50px; border-radius:50%;">';
-    html+=`<tr style="border-bottom:1px solid #444;">
-      <td>${photo}</td>
-      <td>${j.nom}</td>
-      <td>${j.email}</td>
-      <td>${j.prix_paye}f</td>
-      <td>
-        <button onclick="approuver('${j.id}')" style="background:green;">Approuver</button>
-        <button onclick="refuser('${j.id}')" style="background:red;">Refuser</button>
-      </td>
+    const photo = j.photo? `<img src="${j.photo}" style="width:50px; height:50px; border-radius:50%;">` : '<img src="https://i.imgur.com/default.png" style="width:50px; height:50px; border-radius:50%;">';
+    html+=`<tr>
+      <td>${photo}</td><td>${j.nom}</td><td>${j.email}</td><td>${j.prix_paye}f</td>
+      <td><button onclick="approuver('${j.id}')">Approuver</button> <button onclick="refuser('${j.id}')">Refuser</button></td>
     </tr>`;
   });
-  document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=5>Aucun joueur en attente</td></tr>";
+  document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=5>Aucun joueur</td></tr>";
 }
 
 window.approuver = async (id) => {
   const joueur = await db.collection("joueurs").doc(id).get();
   await db.collection("joueurs").doc(id).update({statut:"approuve"});
-  await db.collection("notifications").add({ pour: joueur.data().email, message: "Félicitations! Ton inscription KOFFI BASKET a été approuvée ✅", lu: false, date: new Date() });
-  alert("Joueur approuvé"); chargerJoueurs();
-}
-
-window.refuser = async (id) => {
-  await db.collection("joueurs").doc(id).update({statut:"refuse"});
-  alert("Refusé");
+  await db.collection("notifications").add({ pour: joueur.data().email, message: "Approuvé ✅", lu: false, date: new Date() });
   chargerJoueurs();
 }
+window.refuser = async (id) => { await db.collection("joueurs").doc(id).update({statut:"refuse"}); chargerJoueurs(); }
 
+// EQUIPES
 async function chargerEquipes(){
-  try{
-    const snap = await db.collection("equipes").get();
-    let html = "";
-    snap.forEach(d=>{
-      const eq = d.data();
-      if(eq.statut == "attente"){
-        html += `<div style="background:#222; padding:10px; margin:10px 0;">
-          <b>${eq.nom}</b> <br> Capitaine: ${eq.capitaine} <br> Membres: ${eq.membres.join(', ')} <br>
-          <button onclick="approuverEquipe('${d.id}')">Approuver</button>
-        </div>`;
-      }
-    });
-    document.getElementById('listeEquipes').innerHTML = html || "<p>Aucune équipe en attente</p>";
-  }catch(e){ document.getElementById('listeEquipes').innerHTML = "<p>Erreur</p>"; }
+  const snap = await db.collection("equipes").get();
+  let html = "";
+  snap.forEach(d=>{ if(d.data().statut == "attente"){ html += `<div><b>${d.data().nom}</b> <button onclick="approuverEquipe('${d.id}')">Approuver</button></div>`; } });
+  document.getElementById('listeEquipes').innerHTML = html || "<p>Aucune équipe</p>";
 }
-
-window.approuverEquipe = async (id) => {
-  await db.collection("equipes").doc(id).update({statut:"approuve"});
-  alert("Equipe approuvée");
-  chargerEquipes();
-}
-
+window.approuverEquipe = async (id) => { await db.collection("equipes").doc(id).update({statut:"approuve"}); chargerEquipes(); }
 window.soumettreEquipe = async () => {
   const nom = document.getElementById('nomEquipe').value;
   const membres = [...document.querySelectorAll('.membre')].map(i=>i.value).filter(v=>v);
   await db.collection("equipes").add({ nom, capitaine: joueurConnecte.email, membres, statut:"attente" });
-  alert("Equipe envoyée à l'admin"); showPage('espace-joueur');
+  alert("Equipe envoyée"); showPage('espace-joueur');
 }
 
+// ACTUS + NOTIFS
 async function chargerAnnonces(){
   const snap = await db.collection("annonces").get();
   let html = "";
-  snap.forEach(d=>{
-    const a = d.data();
-    html+=`<div style="background:#222; padding:15px; margin:10px 0; border-radius:10px;">
-      <b>[${a.categorie}] ${a.titre}</b>
-      ${a.image? `<img src="${a.image}" style="width:100%; border-radius:8px; margin:10px 0;">` : ''}
-      <p>${a.message}</p>
-    </div>`;
-  });
+  snap.forEach(d=>{ const a = d.data(); html+=`<div><b>[${a.categorie}] ${a.titre}</b> ${a.image? `<img src="${a.image}" style="width:100%;">` : ''} <p>${a.message}</p></div>`; });
   document.getElementById('listeAnnonces').innerHTML = html || "Aucune annonce";
 }
-
 async function chargerNotifications(){
   if(!joueurConnecte) return;
   const snap = await db.collection("notifications").where("pour","==",joueurConnecte.email).where("lu","==",false).get();
-  if(snap.size > 0 && document.getElementById('notifBox')){
-    document.getElementById('notifBox').style.display = 'block';
-    document.getElementById('nbNotif').textContent = snap.size;
-  }
+  if(snap.size > 0){ document.getElementById('notifBox').style.display = 'block'; document.getElementById('nbNotif').textContent = snap.size; }
 }
-
 window.voirNotifications = async () => {
   const snap = await db.collection("notifications").where("pour","==",joueurConnecte.email).where("lu","==",false).get();
-  let texte = "";
-  snap.forEach(d => { texte += "🔔 " + d.data().message + "\n\n"; d.ref.update({lu:true}); });
-  alert(texte);
-  document.getElementById('notifBox').style.display = 'none';
-        }
+  let texte = ""; snap.forEach(d => { texte += "🔔 " + d.data().message + "\n\n"; d.ref.update({lu:true}); });
+  alert(texte); document.getElementById('notifBox').style.display = 'none';
+                                           }
