@@ -10,7 +10,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 let joueurConnecte = null;
-
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -27,13 +26,25 @@ document.getElementById('codePromo').oninput = (e) => {
 document.getElementById('formJoueur').onsubmit = async (e) => {
   e.preventDefault(); const f = e.target;
   const prix = f.code_promo.value.toUpperCase()==='KOFFI25'?75:100;
+  
+  let photoUrl = "";
+  const photoFile = document.getElementById('photoJoueur').files[0];
+  if(photoFile){
+    const formData = new FormData();
+    formData.append("image", photoFile);
+    const res = await fetch("https://api.imgbb.com/1/upload?key=TA_CLE_IMGBB_ICI", { method: "POST", body: formData });
+    const data = await res.json();
+    photoUrl = data.data.url;
+  }
+
   await db.collection("joueurs").add({
     nom:f.nom.value, nationalite:f.nationalite.value, taille:f.taille.value, poids:f.poids.value, poste:f.poste.value,
     email:f.email.value, whatsapp:f.whatsapp.value, mot_de_passe: f.mot_de_passe.value, 
+    photo: photoUrl, // <-- ON AJOUTE LA PHOTO ICI
     prix_paye:prix, statut:"attente", date:new Date()
   });
   alert(`Inscription ok! Envoie ${prix}f au 0162196973.`); f.reset(); showPage('accueil');
-}
+    }
 
 // CONNEXION JOUEUR
 window.loginJoueur = async () => {
@@ -52,6 +63,7 @@ window.loginJoueur = async () => {
     if(joueurConnecte.statut === "refuse"){ alert("Inscription refusée"); }
   } else { alert("Mauvais email ou mot de passe"); }
 }
+document.getElementById('photoProfil').src = joueurConnecte.photo || 'https://i.imgur.com/default.png';
 
 // CONNEXION ADMIN
 window.loginAdmin = () => {
@@ -117,17 +129,39 @@ async function chargerMesEquipes(){ /* à faire plus tard */ }
 // ADMIN : PUBLIER
 document.getElementById('formPublication').onsubmit = async (e) => {
   e.preventDefault();
-  await db.collection("annonces").add({ 
+  const file = document.getElementById('imagePub').files[0];
+  let imageUrl = "";
+
+  // 1. Upload l'image sur imgbb
+  if(file){
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await fetch("https://api.imgbb.com/1/upload?key=TA_CLE_IMGBB_ICI", { method: "POST", body: formData });
+    const data = await res.json();
+    imageUrl = data.data.url;
+  }
+
+  // 2. Enregistre la publi avec l'url de l'image
+  await db.collection("annonces").add({
     categorie: document.getElementById('categoriePub').value,
     titre: document.getElementById('titrePub').value,
-    message: document.getElementById('messagePub').value, date: new Date() 
+    message: document.getElementById('messagePub').value,
+    image: imageUrl, // <-- AJOUTE ÇA
+    date: new Date()
   });
-  alert("Publié"); document.getElementById('formPublication').reset(); showPage('admin'); 
-}
+  alert("Publié"); document.getElementById('formPublication').reset(); showPage('admin');
+                                                                                    }
 async function chargerAnnonces(){
   const snap = await db.collection("annonces").orderBy("date","desc").get();
   let html = "";
-  snap.forEach(d=>{ const a = d.data(); html+=`<div><b>[${a.categorie}] ${a.titre}</b><p>${a.message}</p></div>`; });
+  snap.forEach(d=>{ 
+    const a = d.data(); 
+    html+=`<div style="background:#222; padding:15px; margin:10px 0; border-radius:10px;">
+      <b>[${a.categorie}] ${a.titre}</b>
+      ${a.image? `<img src="${a.image}" style="width:100%; border-radius:8px; margin:10px 0;">` : ''}
+      <p>${a.message}</p>
+    </div>`; 
+  });
   document.getElementById('listeAnnonces').innerHTML = html || "Aucune annonce";
 }
 
