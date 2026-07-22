@@ -56,9 +56,10 @@ window.loginJoueur = async () => {
     if(joueurConnecte.statut === "attente"){ alert("En attente de validation"); showPage('accueil'); return; }
     if(joueurConnecte.statut === "approuve"){ 
   document.getElementById('bienvenueJoueur').textContent = "Bienvenue " + joueurConnecte.nom; 
+  document.getElementById('photoProfil').src = joueurConnecte.photo || 'https://i.imgur.com/default.png'; // <-- AJOUTE ICI
   showPage('espace-joueur'); 
-  chargerNotifications();
-  setInterval(chargerNotifications, 5000);
+  chargerNotifications(); 
+  setInterval(chargerNotifications, 5000); 
     }
     if(joueurConnecte.statut === "refuse"){ alert("Inscription refusée"); }
   } else { alert("Mauvais email ou mot de passe"); }
@@ -156,7 +157,7 @@ document.getElementById('formPublication').onsubmit = async (e) => {
   alert("Publié"); document.getElementById('formPublication').reset(); showPage('admin');
                                                                                     }
 async function chargerAnnonces(){
-  const snap = await db.collection("annonces").orderBy("date","desc").get();
+  const snap = await db.collection("annonces").get();
   let html = "";
   snap.forEach(d=>{ 
     const a = d.data(); 
