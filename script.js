@@ -32,14 +32,20 @@ window.onload = function(){
       e.preventDefault(); const f = e.target;
       const prix = f.code_promo.value.toUpperCase()==='KOFFI25'?75:100;
       let photoUrl = "";
-      const photoFile = document.getElementById('photoJoueur').files[0];
-      if(photoFile){
-        const formData = new FormData();
-        formData.append("image", photoFile);
-        const res = await fetch("https://api.imgbb.com/1/upload?key=9a1fb916aa791ee3077810ebda9f7c3b", { method: "POST", body: formData });
-        const data = await res.json();
-        photoUrl = data.data.url;
-      }
+const photoFile = document.getElementById('photoJoueur').files[0];
+if(photoFile){
+  const formData = new FormData();
+  formData.append("image", photoFile);
+  const res = await fetch("https://api.imgbb.com/1/upload?key=9a1fb916aa791ee3077810ebda9f7c3b", { method: "POST", body: formData });
+  const data = await res.json();
+
+  if(data.success){ // <-- ON VERIFIE
+    photoUrl = data.data.url;
+  } else {
+    alert("Erreur upload image: " + data.error.message); // <-- POUR VOIR L'ERREUR
+    return;
+  }
+}
       await db.collection("joueurs").add({ nom:f.nom.value, nationalite:f.nationalite.value, taille:f.taille.value, poids:f.poids.value, poste:f.poste.value, email:f.email.value, whatsapp:f.whatsapp.value, mot_de_passe: f.mot_de_passe.value, photo: photoUrl, prix_paye:prix, statut:"attente", date:new Date() });
       alert(`Inscription ok! Envoie ${prix}f au 0162196973.`); f.reset(); showPage('accueil');
     }
