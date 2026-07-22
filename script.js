@@ -66,13 +66,17 @@ window.loginJoueur = async () => {
 document.getElementById('photoProfil').src = joueurConnecte.photo || 'https://i.imgur.com/default.png';
 
 // CONNEXION ADMIN
+// CONNEXION ADMIN
 window.loginAdmin = () => {
-  if(document.getElementById('adminPass').value === "admin123"){
+  const pass = document.getElementById('adminPass').value;
+  if(pass === "admin123"){ // <-- Change le mot de passe ici si tu veux
     showPage('admin');
-  } else { alert("Mauvais mot de passe admin"); }
+  } else { 
+    alert("Mauvais mot de passe admin"); 
+  }
 }
+
 window.logout = () => showPage('accueil');
-window.logoutJoueur = () => { joueurConnecte = null; showPage('accueil'); }
 
 // ADMIN : CHARGER JOUEURS
 async function chargerJoueurs(){
