@@ -43,7 +43,12 @@ window.loginJoueur = async () => {
   if(snap.size > 0){
     joueurConnecte = snap.docs[0].data();
     if(joueurConnecte.statut === "attente"){ alert("En attente de validation"); showPage('accueil'); return; }
-    if(joueurConnecte.statut === "approuve"){ document.getElementById('bienvenueJoueur').textContent = "Bienvenue " + joueurConnecte.nom; showPage('espace-joueur'); }
+    if(joueurConnecte.statut === "approuve"){ 
+  document.getElementById('bienvenueJoueur').textContent = "Bienvenue " + joueurConnecte.nom; 
+  showPage('espace-joueur'); 
+  chargerNotifications();
+  setInterval(chargerNotifications, 5000);
+    }
     if(joueurConnecte.statut === "refuse"){ alert("Inscription refusée"); }
   } else { alert("Mauvais email ou mot de passe"); }
 }
@@ -68,7 +73,21 @@ async function chargerJoueurs(){
   });
   document.getElementById('listeJoueurs').innerHTML = html || "<tr><td colspan=4>Aucun joueur</td></tr>";
 }
-window.approuver = async (id) => { await db.collection("joueurs").doc(id).update({statut:"approuve"}); alert("Approuvé"); chargerJoueurs(); }
+window.approuver = async (id) => {
+  const joueur = await db.collection("joueurs").doc(id).get();
+  await db.collection("joueurs").doc(id).update({statut:"approuve"});
+  
+  // ENVOIE NOTIF
+  await db.collection("notifications").add({
+    pour: joueur.data().email,
+    message: "Félicitations! Ton inscription KOFFI BASKET a été approuvée ✅",
+    lu: false,
+    date: new Date()
+  });
+  
+  alert("Joueur approuvé"); 
+  chargerJoueurs(); 
+}
 window.refuser = async (id) => { await db.collection("joueurs").doc(id).update({statut:"refuse"}); alert("Refusé"); chargerJoueurs(); }
 
 // ADMIN : CHARGER EQUIPES
@@ -117,4 +136,25 @@ window.envoyerMessage = async () => {
   const msg = document.getElementById('messageInput').value;
   await db.collection("messages").add({ de: joueurConnecte.email, pour:"admin", message: msg, date: new Date() });
   document.getElementById('messageInput').value = ""; 
+}
+// CHARGER LES NOTIFS
+async function chargerNotifications(){
+  if(!joueurConnecte) return;
+  const snap = await db.collection("notifications").where("pour","==",joueurConnecte.email).where("lu","==",false).get();
+  if(snap.size > 0){
+    document.getElementById('notifBox').style.display = 'block';
+    document.getElementById('nbNotif').textContent = snap.size;
+  }
+}
+
+// VOIR ET MARQUER COMME LU
+window.voirNotifications = async () => {
+  const snap = await db.collection("notifications").where("pour","==",joueurConnecte.email).where("lu","==",false).get();
+  let texte = "";
+  snap.forEach(d => { 
+    texte += "🔔 " + d.data().message + "\n\n";
+    d.ref.update({lu:true});
+  });
+  alert(texte);
+  document.getElementById('notifBox').style.display = 'none';
 }
